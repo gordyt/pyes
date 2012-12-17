@@ -59,6 +59,9 @@ class Connection(object):
         self._lock = threading.RLock()
         self._local = threading.local()
 
+    def close(self):
+        POOL_MANAGER.clear()
+
     def execute(self, request):
         """Execute a request and return a response"""
         url = request.uri

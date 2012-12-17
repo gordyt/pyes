@@ -657,6 +657,12 @@ class ES(object):
     default_indices = property(_get_default_indices, _set_default_indices)
     del _get_default_indices, _set_default_indices
 
+    def close(self):
+        self.bulker = None
+        self.indices = None
+        self.cluster = None
+        self.connection.close()
+
     @property
     def mappings(self):
         if self._mappings is None:
