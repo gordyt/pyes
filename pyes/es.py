@@ -1229,6 +1229,48 @@ class ES(object):
                     raise
                 self.refresh(index)
 
+    def update_es(self,
+        index,
+        doc_type,
+        id,
+        script=None,
+        params=None,
+        doc=None,
+        upsert=None,
+        querystring_args=None
+    ):
+        '''
+        Update a document using the ES _update API.  This is done on the server, not
+        the client.
+        :param string index: The index or alias
+        :param string doc_type: The doc type
+        :param string id: The document id
+        :param string script: If not None, a script block
+        :param dict params: If not None, parameters for the script
+        :param dict doc: If not None, the updates to apply
+        :param dict upsert: If not None, the value to use to index the document.
+            If you call update_es for a document that does not exist and you
+            do not supply an upsert, then the operation will fail.
+        :param dict querystring_args: If not None, these are sent with request
+        '''
+        payload = {}
+        if script:
+            payload['script'] = script
+        if params:
+            payload['params'] = params
+        if doc or upsert:
+            payload['doc'] = doc or {}
+            if upsert:
+                payload['upsert'] = {}
+
+        path = make_path([index, doc_type, id])
+        return self._send_request(
+            'POST',
+            path,
+            payload,
+            querystring_args if querystring_args is not None else {}
+        )
+
     def delete(self, index, doc_type, id, bulk=False, routing=None, **querystring_args):
         """
         Delete a typed JSON document from a specific index based on its id.
