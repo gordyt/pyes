@@ -1261,9 +1261,9 @@ class ES(object):
         if doc or upsert:
             payload['doc'] = doc or {}
             if upsert:
-                payload['upsert'] = {}
+                payload['upsert'] = upsert
 
-        path = make_path([index, doc_type, id])
+        path = make_path([index, doc_type, id, '_update'])
         return self._send_request(
             'POST',
             path,
