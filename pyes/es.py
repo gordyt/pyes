@@ -1264,16 +1264,12 @@ class ES(object):
                 payload['upsert'] = upsert
 
         path = make_path([index, doc_type, id, '_update'])
-        for attempt in xrange(2):
-            try:
-                return self._send_request(
-                    'POST',
-                    path,
-                    payload,
-                    querystring_args if querystring_args is not None else {}
-                )
-            except VersionConflictEngineException:
-                pass
+        return self._send_request(
+            'POST',
+            path,
+            payload,
+            params = querystring_args if querystring_args is not None else {}
+        )
 
     def delete(self, index, doc_type, id, bulk=False, routing=None, **querystring_args):
         """
