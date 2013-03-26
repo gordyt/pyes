@@ -1402,7 +1402,7 @@ class ES(object):
             return [model(self, item) for item in results['docs']]
         return []
 
-    def search_raw(self, query, indices=None, doc_types=None, **query_params):
+    def search_raw(self, query, indices=None, doc_types=None, routing=None, **query_params):
         """Execute a search against one or more indices to get the search hits.
 
         `query` must be a Search object, a Query object, or a custom
@@ -1410,6 +1410,8 @@ class ES(object):
         directly.
 
         """
+        if routing:
+            query_params["routing"]=routing
         indices = self._validate_indices(indices)
         if doc_types is None:
             doc_types = []
