@@ -1083,8 +1083,9 @@ class ES(object):
         return data['_name'], base64.standard_b64decode(data['content'])
 
     def update(self, index, doc_type, id, script=None, lang="mvel", params=None, document=None, upsert=None,
-               model=None, bulk=False):
+               model=None, bulk=False, retry_on_conflict=None, routing=None, doc_as_upsert=None):
         body = {}
+        request_params = {}
         if script:
             body.update({"script": script, "lang": lang})
         if params:
@@ -1093,16 +1094,27 @@ class ES(object):
             body["upsert"] = upsert
         if document:
             body["doc"] = document
+        if doc_as_upsert is not None:
+            body["doc_as_upsert"] = doc_as_upsert
 
         if bulk:
             cmd = {"update": {"_index": index, "_type": doc_type, "_id": id}}
+            if retry_on_conflict:
+                cmd["update"]['_retry_on_conflict'] = retry_on_conflict
+            if routing:
+                cmd["update"]['routing'] = routing
             command = "%s\n%s" % (json.dumps(cmd, cls=self.encoder), json.dumps(body, cls=self.encoder))
             self.bulker.add(command)
             return self.flush_bulk()
+        else:
+            if routing is not None:
+                request_params['routing'] = routing
+            if retry_on_conflict is not None:
+                body["retry_on_conflict"] = retry_on_conflict
 
         path = make_path(index, doc_type, id)
         model = model or self.model
-        return model(self, self._send_request('POST', path + "/_update", body))
+        return model(self, self._send_request('POST', path + "/_update", body, params=request_params))
 
     def update_by_function(self, extra_doc, index, doc_type, id, querystring_args=None,
                            update_func=None, attempts=2):
