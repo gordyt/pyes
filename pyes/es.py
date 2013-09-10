@@ -661,7 +661,6 @@ class ES(object):
         self.bulker = None
         self.indices = None
         self.cluster = None
-        self.connection.close()
 
     @property
     def mappings(self):
