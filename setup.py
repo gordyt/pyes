@@ -86,7 +86,7 @@ else:
     long_description = "See http://pypi.python.org/pypi/pyes"
 
 setup(
-    name='pyes',
+    name='python-pyes',
     version=meta['VERSION'],
     description="Python Elastic Search driver",
     author=meta['author'],
